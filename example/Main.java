@@ -1,63 +1,81 @@
 package org.example;
 
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.text.SimpleDateFormat;
 
 public class Main {
-    public static void main(String[] args) {
-        //    1) реализовать метод, который принимает год и проверяет на високосность
+    public static void main(String[] args) throws InterruptedException {
+/*
+ 1 уровень сложности: 1. На соревнованиях 5 спортсменов начинают одновременно стрелять в одну мишень.
+Если кто-нибудь в нее попадает(сделать Random-но), то мишень разрушается и другие в нее уже попасть не могут,
+но что-то пошло не так. Исправь программу, чтобы другие потоки "видели" изменения значения
+переменной isHit и больше его не меняли. Как только мишень разрушена кем то из стрелков,
+соревнования прекращаются. Воспользуйся классом AtomicBoolean и его методами.
+ */
+        System.out.println(" --- Competition Start --- ");
+        AtomicInteger purpose = new AtomicInteger(56);
+        AtomicBoolean isHeat = new AtomicBoolean(false);
 
-        LocalDate localDate = LocalDate.EPOCH.withYear(2024);
-        System.out.println("Год после Эпохи является високосным " + localDate.isLeapYear());
-        LocalDate localDate1 = LocalDate.of(1956, Month.JULY, 1);
-        System.out.println("Год до Эпохи является високосным  " + localDate1.isLeapYear());
+        Shooter shooter1 = new Shooter("Bob",isHeat,purpose);
+        Shooter shooter2 = new Shooter("Tom",isHeat,purpose);
+        Shooter shooter3 = new Shooter("Ann",isHeat,purpose);
+        Shooter shooter4 = new Shooter("Sam",isHeat,purpose);
+        Shooter shooter5 = new Shooter("Kat",isHeat,purpose);
+        Thread thread1 = new Thread(shooter1);
+        Thread thread2 = new Thread(shooter2);
+        Thread thread3 = new Thread(shooter3);
+        Thread thread4 = new Thread(shooter4);
+        Thread thread5 = new Thread(shooter5);
 
-        //2) вывести на консоль дату локализованную для Индии (например)
-        //  System.out.println(ZoneId.getAvailableZoneIds());
-        ZoneId zoneId = ZoneId.of("Asia/Calcutta");
-        ZonedDateTime dateTime = ZonedDateTime.now(zoneId);
-        System.out.println(dateTime);
 
-        //  3) вывести дату в формате 19-12-22, 19, 353, 11:47 <дата, день месяца, день в году, время>
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy, d, D, hh:mm");
-        Date date = new Date(2022, Calendar.DECEMBER, 19, 11, 47);
-        String stringDate = dateFormat.format(date);
-        System.out.println(stringDate);
+        thread1.start();
+        thread2.start();
+        thread3.start();
+        thread4.start();
+        thread5.start();
 
-//     4) создать дату своего рождения, вывести на консоль в формате "10 Января 1985"
+        thread1.join();
+        thread2.join();
+        thread3.join();
+        thread4.join();
+        thread5.join();
 
-        LocalDate dateOfBirth = LocalDate.of(1789, Month.JULY, 14);
-        Locale locale = new Locale("fr");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", locale);
-        System.out.println(dateOfBirth.format(formatter));
 
-        // 5) проверить дата "10 Января 1985" - это пятница?
-        Calendar calendar = new GregorianCalendar();
-        calendar.set(1985,Calendar.JANUARY,10);
-        System.out.println(calendar.getTime());
-        System.out.println(calendar.get(Calendar.DAY_OF_WEEK) == DayOfWeek.FRIDAY.getValue());
-
- // 6) вычесть 10 лет из созданной даты, вывести на консоль
-        LocalDate dateLocal = LocalDate.of(1871,Month.MARCH,3);
-        System.out.println(dateLocal.minusYears(10));
-
-//   7) получить объект Instant из "2022-12-19T06:55:30.00Z", вывести на консоль
-        String subject = "2022-12-19T06:55:30.00Z";
-        Instant object = Instant.parse(subject);
-        System.out.println(object.toEpochMilli());
-
-  // 8) получить ZonedDateTime из "Pacific/Midway", вывести на консоль
-
-        ZoneId id = ZoneId.of("Pacific/Midway");
-        ZonedDateTime dateZone = ZonedDateTime.now(id);
-        System.out.println(dateZone);
+        System.out.println(" --- Competition Finish --- ");
 
 
     }
 
+    static class Shooter implements Runnable {
+        private String name;
+       private  AtomicBoolean isHit;
+        private  AtomicInteger purpose;
+
+        public Shooter(String name, AtomicBoolean isHit, AtomicInteger purpose) {
+            this.name = name;
+            this.isHit = isHit;
+            this.purpose = purpose;
+        }
+
+        Random random = new Random();
+
+
+        @Override
+        public void run() {
+            while (!isHit.get()){
+
+                if (purpose.get() == random.nextInt(100)) {
+                    isHit.set(true);
+                    System.out.println(name + " В яблочко!  isHeat " + isHit);
+                    break;  // прерывает потоки не сразу = продолжают стрелять и поражать мишени
+                } else  {
+                    isHit = new AtomicBoolean(false);
+                    System.out.println(name + " Молоко! ...  isHeat " + isHit);
+                }
+
+            }
+        }
+    }
 }
