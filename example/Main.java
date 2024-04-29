@@ -1,81 +1,37 @@
 package org.example;
 
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
-
 public class Main {
-    public static void main(String[] args) throws InterruptedException {
-/*
- 1 уровень сложности: 1. На соревнованиях 5 спортсменов начинают одновременно стрелять в одну мишень.
-Если кто-нибудь в нее попадает(сделать Random-но), то мишень разрушается и другие в нее уже попасть не могут,
-но что-то пошло не так. Исправь программу, чтобы другие потоки "видели" изменения значения
-переменной isHit и больше его не меняли. Как только мишень разрушена кем то из стрелков,
-соревнования прекращаются. Воспользуйся классом AtomicBoolean и его методами.
- */
-        System.out.println(" --- Competition Start --- ");
-        AtomicInteger purpose = new AtomicInteger(56);
-        AtomicBoolean isHeat = new AtomicBoolean(false);
+    public static void main(String[] args) {
+        /*
+1 уровень сложности: 1. Кассир в магазине. К нему подходят клиенты с товаром отдают ему деньги и получают сдачу.
+По окончанию работы кассир подсчитывает сумму в кассе и сдает выручку.
+Кассир и каждый покупатель - это отдельные потоки. Сымитируйте данный процесс работы. Сумма оплаты и
+сумма сдачи может быть сгенерирована случайным образом, чтобы сдача была всегда меньше чем оплата.
+Какой синхронизатор с библиотеки concurrent Вы бы использовали для данного процесса?
 
-        Shooter shooter1 = new Shooter("Bob",isHeat,purpose);
-        Shooter shooter2 = new Shooter("Tom",isHeat,purpose);
-        Shooter shooter3 = new Shooter("Ann",isHeat,purpose);
-        Shooter shooter4 = new Shooter("Sam",isHeat,purpose);
-        Shooter shooter5 = new Shooter("Kat",isHeat,purpose);
-        Thread thread1 = new Thread(shooter1);
-        Thread thread2 = new Thread(shooter2);
-        Thread thread3 = new Thread(shooter3);
-        Thread thread4 = new Thread(shooter4);
-        Thread thread5 = new Thread(shooter5);
-
-
-        thread1.start();
-        thread2.start();
-        thread3.start();
-        thread4.start();
-        thread5.start();
-
-        thread1.join();
-        thread2.join();
-        thread3.join();
-        thread4.join();
-        thread5.join();
+2*. Вы пишете книгу и вы автор. Есть 2 человека, которые выступают у вас соавторами.
+ На этапе написания книги, они пишут разные главы, помогая таким образом вам полностью ее закончить.
+ После того как вы и все соавторы закончили свою работу, вы отправляете книгу на рецензирование.
+ В группу рецензентов входит 3 человека, каждый из которых является специалистом в своей области
+ и проверяет Вашу книгу на правильность отражения фактов в вашем произведении.
+ После того как все рецензии получены, Вы отправляете книгу в издательский дом.
+ В редакции главный редактор и руководитель издательства читают ваше творение и утверждают
+ его в печать.
+ Вы относите утвержденные рукописи печатникам, они печатают книгу, переплетчики делают ей переплет,
+ а служба доставки развозят книги по магазинам.
+ Поздравляю Вас, вы полностью прошли все фазы становления известного писателя, т.к. Ваша книга
+ стала бестселлером!).
+ Создайте приложение, которое сымитирует работу процесса создания книги, с учетом того что каждый человек,
+ который встречается в описанной схеме будет представлен отдельным потоком.
+ Какой синхронизатор с библиотеки concurrent мог бы быть Вам полезен при выполнении данной задачи?
 
 
-        System.out.println(" --- Competition Finish --- ");
-
-
-    }
-
-    static class Shooter implements Runnable {
-        private String name;
-       private  AtomicBoolean isHit;
-        private  AtomicInteger purpose;
-
-        public Shooter(String name, AtomicBoolean isHit, AtomicInteger purpose) {
-            this.name = name;
-            this.isHit = isHit;
-            this.purpose = purpose;
-        }
-
-        Random random = new Random();
-
-
-        @Override
-        public void run() {
-            while (!isHit.get()){
-
-                if (purpose.get() == random.nextInt(100)) {
-                    isHit.set(true);
-                    System.out.println(name + " В яблочко!  isHeat " + isHit);
-                    break;  // прерывает потоки не сразу = продолжают стрелять и поражать мишени
-                } else  {
-                    isHit = new AtomicBoolean(false);
-                    System.out.println(name + " Молоко! ...  isHeat " + isHit);
-                }
-
-            }
-        }
+3**. Для желающих поломать голову, усложним задачу из прошлого домашнего задания:
+Для подъема на смотровую площадку работает лифт, в который одновременно может сесть не более 5 человек
+или он может поднять не более 300 кг. груза. Создайте группу людей, каждый из которых будет иметь
+характеристику вес.
+Создайте программу-симулятор работы лифта, при разном количестве людей в группе(можно вводить с клавиатуры).
+Вес человека можно генерировать, но не более 150 кг. :)
+        */
     }
 }
